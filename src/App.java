@@ -4,26 +4,35 @@ public class App {
 	
 	private static int port = 3050;
 	private static int timeout = 5000;
+	public static String separator = " - ";
+	public static String okMessage = "OK";
+	public static String failMessage = "FAIL";
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		int count = 0;
 		while (in.hasNext()) {
 			count++;
-			String[] hostport = in.nextLine().split(":");
-			if (hostport.length > 1) {
+			String[] line = in.nextLine().split(":");
+			if (line.length > 1) {
 				try {
-					if (hostport[0].equalsIgnoreCase("port"))
-						port = Integer.parseInt(hostport[1]);
-					else if (hostport[0].equalsIgnoreCase("timeout"))
-						timeout = Integer.parseInt(hostport[1]);
+					if (line[0].equalsIgnoreCase("port"))
+						port = Integer.parseInt(line[1]);
+					else if (line[0].equalsIgnoreCase("timeout"))
+						timeout = Integer.parseInt(line[1]);
+					else if (line[0].equalsIgnoreCase("separator"))
+						separator = line[1];
+					else if (line[0].equalsIgnoreCase("okmessage"))
+						okMessage = line[1];
+					else if (line[0].equalsIgnoreCase("failmessage"))
+						failMessage = line[1];
 					else
-						(new Thread( new SocketTesterThread(hostport[0], Integer.parseInt(hostport[1]), timeout) ) ).start();
+						(new Thread( new SocketTesterThread(line[0], Integer.parseInt(line[1]), timeout) ) ).start();
 				} catch (NumberFormatException e) {
 					System.out.println("Erro ao converter string em numero (Linha "+count+")");
 				}
-			} else if (hostport.length == 1) {
-				(new Thread( new SocketTesterThread(hostport[0], port, timeout) ) ).start();
+			} else if (line.length == 1) {
+				(new Thread( new SocketTesterThread(line[0], port, timeout) ) ).start();
 			}
 		}
 		in.close();
@@ -52,7 +61,7 @@ public class App {
 		@Override
 		public void run() {
 			s = new SocketTest(host, port, timeout);
-			System.out.println(host + ":" + port + " - " + (s.getStatus() == SocketTest.SUCCESS ? "OK" : "FAIL"));
+			System.out.println(host + ":" + port + separator + (s.getStatus() == SocketTest.SUCCESS ? okMessage : failMessage));
 		}
 		
 	}
